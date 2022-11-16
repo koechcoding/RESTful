@@ -1,3 +1,4 @@
+const controlllers = require(".");
 var BaseController = require("./basecontrolle"),
 _ = require("underscore"),
 swagger = require("swagger-node-restify")
@@ -28,5 +29,26 @@ module.exports = function(lib){
         return {store: k, copies: v}
     })
    }
-   
+   controller.addAction({
+    'path': '/books',
+    'method': 'GET',
+    'summary': 'Returns the list of books',
+    'params': [ swagger.queryParam('q', 'Search term', 'string'), swagger.queryParam('genre', 'Filter by genre', 'string')],
+    'responseClass': 'Book',
+    'nickname': 'getBooks'
+   },  function(req,res, next){
+    var criteria = {}
+    if(req.param.q){
+        var expr = new RegExp('.*' + req.params.q + '.*')
+        criteria.$or = [
+            {title: expr},
+            {isbn_code: expr},
+            {description: expr}
+        ]
+    }
+    if(req.params.genre){
+        criteria.genre = req.params.genre
+    }
+   })
+
 }
