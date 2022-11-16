@@ -49,6 +49,13 @@ module.exports = function(lib){
     if(req.params.genre){
         criteria.genre = req.params.genre
     }
+    lib.db.model('Books')
+       .find(criteria)
+       .populate('stores.store')
+       .exec(function(err, books){
+        if(err) return next(err)
+        controller.writeHAL(res, books)
+       })
    })
 
 }
