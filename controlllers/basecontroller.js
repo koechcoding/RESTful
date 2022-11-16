@@ -31,3 +31,26 @@ BaseController.prototype.RESTError = function(type, msg){
         console.log("Type " + type + " of error not found".red)
     }
 }
+/**
+Takes care of calling the "toHAL" method on every resource before writing it
+back to the client
+*/
+BaseController.prototype.writeHAL = function(res, obj){
+    if(Array.isArray(obj)){
+        var newArr = []
+    _.each(obj, function(item, k){
+        item = item.toHAL()
+        newArr.push(item)
+    })
+    obj = halson(newArr)
+    }else{
+        if(obj && obj.toHAL)
+          obj = obj.toHAL()
+    }
+    if(!obj){
+        obj = {}
+    }
+    res.json(obj)
+}
+
+module.exports = BaseController;
