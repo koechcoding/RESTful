@@ -17,3 +17,17 @@ BaseController.prototype.setUpActions = function(app, sw){
         app[method.toLowerCase()](act['spec']['path'], act['action'])
     })
 }
+BaseController.prototype.addAction = function(spec, fn){
+    var newAct = {
+        'spec': spec,
+        action: fn
+    }
+    this.actions.push(newAct)
+}
+BaseController.prototype.RESTError = function(type, msg){
+    if(restify[type]){
+        return new restify[type](msg.toString())
+    } else {
+        console.log("Type " + type + " of error not found".red)
+    }
+}
