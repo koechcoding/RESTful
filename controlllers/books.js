@@ -57,5 +57,30 @@ module.exports = function(lib){
         controller.writeHAL(res, books)
        })
    })
+   controller.addAction({
+     'path': '/books/{id}',
+     'method': 'GET',
+     'params': [swagger.pathParam('id', 'The Id of the book', 'int')],
+     'summary': 'Returns the full data of the book',
+     'nickname': 'getBook'
+   }, function(req, res, next){
+    var id = req.params.id
+    if(id){
+        lib.db.model("Book")
+           .findOne({_id: id})
+           .populate('stores')
+           .populate("authors")
+           .populate('reviews')
+           .exec(function(err, book){
+              if(err) return next(controller.RESTError('InternalServerError', err))
+              if(!book){
+                return next(controller.RESTError("ResourceNotFoundError", 'Book not found'))
+              }
+              controller.writeHAL(res, book)
+           })
+    } else {
+        next(controller.RESTError('InvalidArgumentError', 'Missing book id'))
+    }
+   })
 
 }
