@@ -109,5 +109,28 @@ module.exports = function(lib){
         next(controller.RESTError('InvalidArgumentError', 'Missing content of the book'))
      }
    })
+   controller.addAction({
+    'path': '/books/{id}/authors',
+    'method': 'GET',
+    'params': [ swagger.pathParam('id', 'The Id of the book','int') ],
+    'summary': 'Returns the list of authors of one specific book',
+    'nickname': 'getBooksAuthors'
+   }, function(req, res, next){
+    var id = req.params.id
+    if(id){
+        lib.db.model("Book")
+        .findOne({_id: id})
+        .populate('authors')
+        .exec(function(err, book) {
+            if(err) return next(controller.RESTError('InternalServerError', err))
+            if(!book) {
+            return next(controller.RESTError('ResourceNotFoundError', 'Book not found'))
+            }
+            controller.writeHAL(res, book.authors)
+            })
+            } else {
+            next(controller.RESTError('InvalidArgumentError', 'Missing book id'))
+            }
+    })
 
 }
