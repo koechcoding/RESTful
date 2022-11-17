@@ -82,5 +82,32 @@ module.exports = function(lib){
         next(controller.RESTError('InvalidArgumentError', 'Missing book id'))
     }
    })
+   controller.addAction({
+    'path': '/books',
+    'method': 'POST',
+    'params': [ swagger.bodyParam('book', 'JSON representation of the new book', 'string')],
+    'summary': 'Adds a new book into collection',
+    'nickname': 'newBook'
+   }, function(req, res, next){
+     var bookData = req.body
+     if(bookData){
+        isbn = bookData.isbn_code
+        lib.db.model("Book")
+           .findOne({isbn_code: isbn})
+           .exec(function(err, bookModel) {
+              if(!bookModel){
+                bookModel = lib.db.model("Book")(bookData)
+              } else {
+                bookModel.stores = mergeStores(bookModel.stores, bookData.stores)
+              }
+              bookModel.save(function(err, book){
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                controller.writeHAL(res, book)
+              })
+           })
+     } else {
+        next(controller.RESTError('InvalidArgumentError', 'Missing content of the book'))
+     }
+   })
 
 }
