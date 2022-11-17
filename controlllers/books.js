@@ -124,13 +124,37 @@ module.exports = function(lib){
         .exec(function(err, book) {
             if(err) return next(controller.RESTError('InternalServerError', err))
             if(!book) {
-            return next(controller.RESTError('ResourceNotFoundError', 'Book not found'))
+             return next(controller.RESTError('ResourceNotFoundError', 'Book not found'))
             }
-            controller.writeHAL(res, book.authors)
+             controller.writeHAL(res, book.authors)
             })
             } else {
             next(controller.RESTError('InvalidArgumentError', 'Missing book id'))
-            }
+        }
     })
-
+    controller.addAction({
+        'path': '/books/{id}',
+        'method': 'PUT',
+        'params': [ swagger.pathParam('id', 'The Id of the book to update','string'),swagger.bodyParam('book', 'The data to change on the book','string') ],
+        'summary': 'Updates the information of one specific book',
+        'nickname': 'updateBook'
+    }, function(req, res, next){
+        var data = req.body
+        var id = req.params.id
+        if(id){
+            lib.db.model("Book").findOne({_id: id})
+               .exec(function(err, book){
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                if(!book) return next(controller.RESTError('ResourceNotFoundError', 'Book not found'))
+                book = _.extend(book, data)
+                book.save(function(err, data){
+                    if(err) return next(controller.RESTError('InternalServerError', err))
+                      controller.writeHAL(res, data.toJson())
+                })
+               })
+        }else {
+            next(controller.RESTError('InvalidArgumentError', 'Invalid id received'))
+        }
+    })
+    return controller
 }
