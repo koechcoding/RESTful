@@ -153,5 +153,31 @@ module.exports = function(lib){
                 next(controller.RESTError('InvalidArgumentError', 'No data received'))
                 }
             })
+            controller.addAction({
+                'path': '/stores/{id}',
+                'method': 'PUT',
+                'summary': "UPDATES a store's information",
+                'params': [swagger.pathParam('id','The id of the store','string'), swagger.
+                bodyParam('store', 'The new information to update', 'string')],
+                'responseClass': 'Store',
+                'nickname': 'updateStore'
+                }, function (req, res, next) {
+                var data = req.body
+                var id = req.params.id
+                if(id) {
+                lib.db.model("Store").findOne({_id: id}).exec(function(err, store) {
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                if(!store) return next(controller.RESTError('ResourceNotFoundError', 'Storenot found'))
+                store = _.extend(store, data)
+                store.save(function(err, data) {
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                res.json(controller.toHAL(data))
+                })
+                })
+                } else {
+                next(controller.RESTError('InvalidArgumentError', 'Invalid id received'))
+                }
+                })
+                return controller
 
 }
