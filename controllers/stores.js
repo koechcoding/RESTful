@@ -81,6 +81,8 @@ module.exports = function(lib){
                 if(err) return next(controller.RESTError('InternalServerError', err))
                 controller.writeHAL(res, data)
                 })
+        } else {
+            next(controller.RESTError('InvalidArgumentError', 'Invalid id'))
         }
     })
 }
