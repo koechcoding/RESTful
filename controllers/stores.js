@@ -134,5 +134,24 @@ module.exports = function(lib){
         next(controller.RESTError('InvalidArgumentError', 'Invalid id'))
         }
         })
+        controller.addAction({
+            'path': '/stores',
+            'method': 'POST',
+            'summary': 'Adds a new store to the list',
+            'params': [swagger.bodyParam('store', 'The JSON data of the store', 'string')],
+            'responseClass': 'Store',
+            'nickname': 'newStore'
+            }, function (req, res, next) {
+            var data = req.body
+            if(data) {
+                var newStore = lib.db.model('Store')(data)
+                newStore.save(function(err, store) {
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                res.json(controller.toHAL(store))
+                })
+                } else {
+                next(controller.RESTError('InvalidArgumentError', 'No data received'))
+                }
+            })
 
 }
