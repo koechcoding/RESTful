@@ -74,6 +74,13 @@ module.exports = function(lib){
                 criteria.genre = req.params.genre
             }
             //even though this is the stores controller, we deal directly with books here
+            lib.db.model('Book')
+                .find(criteria)
+                .populate('authors')
+                .exec(function(err, data) {
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                controller.writeHAL(res, data)
+                })
         }
     })
 }
