@@ -109,5 +109,30 @@ module.exports = function(lib){
             } else {
             next(controller.RESTError('InvalidArgumentError', 'Invalid id'))
             }
+    })
+    controller.addAction({
+        'path': '/stores/{id}/booksales',
+        'method': 'GET',
+        'params': [swagger.pathParam('id','The id of the store','string')],
+        'summary': 'Returns the list of booksales done on a store',
+        'responseClass': 'BookSale',
+        'nickname': 'getStoresBookSales'
+        }, function (req, res, next) {
+        var id = req.params.id
+        if(id) {
+        //even though this is the stores controller, we deal directly with booksales here
+        lib.db.model('Booksale')
+        .find({store: id})
+        .populate('client')
+        .populate('employee')
+        .populate('books')
+        .exec(function(err, data) {
+        if(err) return next(controller.RESTError('InternalServerError', err))
+        controller.writeHAL(res, data)
         })
+        } else {
+        next(controller.RESTError('InvalidArgumentError', 'Invalid id'))
+        }
+        })
+
 }
