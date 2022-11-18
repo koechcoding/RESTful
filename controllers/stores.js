@@ -85,4 +85,29 @@ module.exports = function(lib){
             next(controller.RESTError('InvalidArgumentError', 'Invalid id'))
         }
     })
+    controller.addAction({
+        'path': '/stores/{id}/employees',
+        'method': 'GET',
+        'params': [swagger.pathParam('id','The id of the store','string')],
+        'summary': 'Returns the list of employees working on a store',
+        'responseClass': 'Employee',
+        'nickname': 'getStoresEmployees'
+        }, function (req, res, next) {
+        var id = req.params.id
+        if(id) {
+            lib.db.model('Store')
+                .findOne({_id: id})
+                .populate('employees')
+                .exec(function(err, data) {
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                if(!data) {
+            return next(controller.RESTError('ResourceNotFoundError', 'Store not found'))
+            }
+            console.log(data)
+            controller.writeHAL(res, data.employees)
+            })
+            } else {
+            next(controller.RESTError('InvalidArgumentError', 'Invalid id'))
+            }
+        })
 }
