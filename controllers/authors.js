@@ -20,6 +20,10 @@ module.exports = function(lib){
         var criteria = {}
         if(req.params.q){
             var expr = new RegExp('.*' + req.params.q + '.*', 'i')
+            criteria.$or = [
+              {name: expr},
+              {description: expr}
+            ]
         }
     })
 }
