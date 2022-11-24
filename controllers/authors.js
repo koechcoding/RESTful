@@ -16,5 +16,7 @@ module.exports = function(lib){
                    swagger.queryParam('q', 'Search parameter', 'string')],
         'responseClass': 'Author',
         'nickname': 'getAuthors'
+    }, function(req, res, next){
+        
     })
 }
