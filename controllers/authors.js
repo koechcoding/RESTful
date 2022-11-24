@@ -17,6 +17,9 @@ module.exports = function(lib){
         'responseClass': 'Author',
         'nickname': 'getAuthors'
     }, function(req, res, next){
-        
+        var criteria = {}
+        if(req.params.q){
+            var expr = new RegExp('.*' + req.params.q + '.*', 'i')
+        }
     })
 }
