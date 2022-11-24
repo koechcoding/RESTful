@@ -6,4 +6,15 @@ function BookSales() {
 BookSales.prototype = new BaseController();
 module.exports = function(lib){
     var controller = new BookSales();
+
+    //list
+    controller.addAction({
+        'path': '/authors',
+        'method': 'GET',
+        'summary': 'Returns the list of authors across all stores',
+        'params': [swagger.queryParam('genre', 'filter authors by genre of their books', 'string'),
+                   swagger.queryParam('q', 'Search parameter', 'string')],
+        'responseClass': 'Author',
+        'nickname': 'getAuthors'
+    })
 }
