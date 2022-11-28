@@ -46,6 +46,29 @@ module.exports = function(lib){
                     if(err) return next(controller.RESTError('InternalServerError', err))
                     controller.writeHAL(res, authors)
                   })
+        } 
+    })
+    //get
+controller.addAction({
+    'path': '/authors/{id}',
+    'summary': 'Returns all the data from one specific author',
+    'method': 'GET',
+    'responseClass': 'Author',
+    'nickname': 'getAuthor'
+    }, function (req, res, next) {
+    var id = req.params.id
+        if(id) {
+        lib.db.model('Author')
+            .findOne({_id: id})
+            .exec(function(err, author) {
+        if(err) return next(controller.RESTError('InternalServerError', err))
+        if(!author) {
+        return next(controller.RESTError('ResourceNotFoundError', 'Author not found'))
+        }
+        controller.writeHAL(res, author)
+        })
+        } else {
+        next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
         }
     })
 }
