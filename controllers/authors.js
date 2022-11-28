@@ -49,26 +49,49 @@ module.exports = function(lib){
         } 
     })
     //get
-controller.addAction({
-    'path': '/authors/{id}',
-    'summary': 'Returns all the data from one specific author',
-    'method': 'GET',
-    'responseClass': 'Author',
-    'nickname': 'getAuthor'
-    }, function (req, res, next) {
-    var id = req.params.id
-        if(id) {
-        lib.db.model('Author')
-            .findOne({_id: id})
-            .exec(function(err, author) {
-        if(err) return next(controller.RESTError('InternalServerError', err))
-        if(!author) {
-        return next(controller.RESTError('ResourceNotFoundError', 'Author not found'))
-        }
-        controller.writeHAL(res, author)
+    controller.addAction({
+        'path': '/authors/{id}',
+        'summary': 'Returns all the data from one specific author',
+        'method': 'GET',
+        'responseClass': 'Author',
+        'nickname': 'getAuthor'
+        }, function (req, res, next) {
+        var id = req.params.id
+            if(id) {
+            lib.db.model('Author')
+                .findOne({_id: id})
+                .exec(function(err, author) {
+            if(err) return next(controller.RESTError('InternalServerError', err))
+            if(!author) {
+            return next(controller.RESTError('ResourceNotFoundError', 'Author not found'))
+            }
+            controller.writeHAL(res, author)
+            })
+            } else {
+            next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
+            }
         })
-        } else {
-        next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
-        }
-    })
+        //POST
+        controller.addAction({
+            'path': '/authors',
+            'summary': 'Adds a new author to the database',
+            'method': 'POST',
+            'params': [swagger.bodyParam('author', 'JSON representation of the data',
+            'string')],
+            'responseClass': 'Author',
+            'nickname': 'addAuthor'
+            }, function (req, res, next) {
+            var body = req.body
+            if(body) {
+            var newAuthor = lib.db.model('Author')(body)
+            newAuthor.save(function(err, author) {
+            if(err) return next(controller.RESTError('InternalServerError', err))
+            controller.writeHAL(res, author)
+            })
+            } else {
+            next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
+            }
+            })
+
+
 }
