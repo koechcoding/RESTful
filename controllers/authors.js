@@ -119,29 +119,30 @@ module.exports = function(lib){
     })
 
  // /books
-controller.addAction({
-    'path': '/authors/{id}/books',
-    'summary': 'Returns the data from all the books of one specific author',
-    'method': 'GET',
-    'params': [ swagger.pathParam('id', 'The id of the author', 'string')],
-    'responseClass': 'Book',
-    'nickname': 'getAuthorsBooks'
-    }, function (req, res, next) {
-    var id = req.params.id
-        if(id) {
-        lib.db.model('Author')
-            .findOne({_id: id}
-            .populate('books')
-            .exec(function(err, author) {
-            if(err) return next(controller.RESTError('InternalServerError', err))
-                if(!author) {
-                return next(controller.RESTError('ResourceNotFoundError', 'Author not found'))
-                }
-            controller.writeHAL(res, author.books)
-         })
-        } else {
-        next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
-        }
-        })
-        return controller
-    }
+    controller.addAction({
+        'path': '/authors/{id}/books',
+        'summary': 'Returns the data from all the books of one specific author',
+        'method': 'GET',
+        'params': [ swagger.pathParam('id', 'The id of the author', 'string')],
+        'responseClass': 'Book',
+        'nickname': 'getAuthorsBooks'
+        }, function (req, res, next) {
+        var id = req.params.id
+            if(id) {
+            lib.db.model('Author')
+                .findOne({_id: id})
+                .populate('books')
+                .exec(function(err, author) {
+                if(err) return next(controller.RESTError('InternalServerError', err))
+                    if(!author) {
+                    return next(controller.RESTError('ResourceNotFoundError', 'Author not found'))
+                    }
+                controller.writeHAL(res, author.books)
+            })
+            }
+             else {
+            next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
+            }
+            })
+            return controller
+}
