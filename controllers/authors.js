@@ -29,6 +29,10 @@ module.exports = function(lib){
         if(filterByGenre){
             lib.db.model("Book")
                   .find({genre: filterByGenre})
+                  .exec(function(err, books){
+                    if(err) return next(controller.RESTError('InternalServerError', err))
+                    findAuthors(_.pluck(books, '_id'))
+                  })
         }
     })
 }
