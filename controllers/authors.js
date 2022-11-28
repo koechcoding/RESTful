@@ -36,5 +36,8 @@ module.exports = function(lib){
         } else{
            findAuthors()
         }
+        function findAuthors(bookIds){
+            
+        }
     })
 }
