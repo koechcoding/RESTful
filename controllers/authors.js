@@ -37,7 +37,9 @@ module.exports = function(lib){
            findAuthors()
         }
         function findAuthors(bookIds){
-            
+            if(bookIds){
+                criteria.books = {$in: bookIds}
+            }
         }
     })
 }
