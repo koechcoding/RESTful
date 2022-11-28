@@ -91,7 +91,32 @@ module.exports = function(lib){
             } else {
             next(controller.RESTError('InvalidArgumentError', 'Missing author id'))
             }
-            })
+        })
+    //put
+ controller.addAction({
+    'path': '/authors/{id}',
+    'method': 'PUT',
+    'summary': "UPDATES an author's information",
+    'params': [swagger.pathParam('id','The id of the author','string'),
+    swagger.bodyParam('author', 'The new information toupdate', 'string')],'responseClass': 'Author','nickname': 'updateAuthor'
+    }, function (req, res, next) {
+        var data = req.body
+        var id = req.params.id
+        if(id) {
+        lib.db.model("Author").findOne({_id: id}).exec(function(err, author) {
+        if(err) return next(controller.RESTError('InternalServerError', err))
+        if(!author) return next(controller.RESTError('ResourceNotFoundError',
+        'Author not found'))
+        author = _.extend(author, data)
+        author.save(function(err, data) {
+        if(err) return next(controller.RESTError('InternalServerError', err))
+        res.json(controller.toHAL(data))
+        })
+        })
+        } else {
+        next(controller.RESTError('InvalidArgumentError', 'Invalid idreceived'))
+        }
+    })
 
 
 }
