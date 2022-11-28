@@ -33,6 +33,8 @@ module.exports = function(lib){
                     if(err) return next(controller.RESTError('InternalServerError', err))
                     findAuthors(_.pluck(books, '_id'))
                   })
+        } else{
+           findAuthors()
         }
     })
 }
