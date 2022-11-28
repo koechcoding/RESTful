@@ -25,5 +25,7 @@ module.exports = function(lib){
               {description: expr}
             ]
         }
+        var filterByGenre = false || req.params.genre
+        
     })
 }
