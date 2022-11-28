@@ -26,6 +26,9 @@ module.exports = function(lib){
             ]
         }
         var filterByGenre = false || req.params.genre
-        
+        if(filterByGenre){
+            lib.db.model("Book")
+                  .find({genre: filterByGenre})
+        }
     })
 }
