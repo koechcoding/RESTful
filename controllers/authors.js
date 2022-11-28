@@ -40,6 +40,12 @@ module.exports = function(lib){
             if(bookIds){
                 criteria.books = {$in: bookIds}
             }
+            lib.db.model("Author")
+                  .find(criteria)
+                  .exec(function(err, authors){
+                    if(err) return next(controller.RESTError('InternalServerError', err))
+                    controller.writeHAL(res, authors)
+                  })
         }
     })
 }
