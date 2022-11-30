@@ -38,4 +38,24 @@ module.exports = function(lib){
           controller.writeHAL(res, sales)
         })
     })
+    controller.addAction({
+      'path': 'booksales',
+      'method': 'POST',
+      'params': [ swagger.bodyParam('booksale', 'JSON representation of the new booksale', 'string')],
+      'summary':'Records a new booksale',
+      'nickname': 'newBookSale'
+    }, function(req, res, next){
+      var body = req.body
+      if(body){
+        var newSale = lib.db.model("Booksale")(body)
+        newSale.save(function(err, sale){
+          if(err) return next(controller.RESTError("InternalServerError", err))
+          controller.writeHAL(res, sale)
+        })
+      }else {
+        next(controller.RESTError("InvalidArgumentError", "Missing json data"))
+      }
+    })
+    return controller
+    
 }
